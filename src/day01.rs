@@ -59,6 +59,16 @@ mod tests {
     fn example() {
         let input = read_example(1);
         assert_eq!(part_one(&input), 142);
-        assert_eq!(part_two(&input), 142);
+
+        let input = r"
+            two1nine
+            eightwothree
+            abcone2threexyz
+            xtwone3four
+            4nineeightseven2
+            zoneight234
+            7pqrstsixteen
+        ";
+        assert_eq!(part_two(&input), 281);
     }
 }
