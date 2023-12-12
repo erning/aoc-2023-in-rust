@@ -2,5 +2,18 @@
 
 ```
 $ cargo run --release -- --time
+
+--- Day 1: Trebuchet?! ---
+Part One: 57346
+Part Two: 57345
+
+--- Day 2: Cube Conundrum ---
+Part One: 2265
+Part Two: 64097
+
+--- Day 3: Gear Ratios ---
+Part One: 520135
+Part Two: 72514855
+
 ```
 
