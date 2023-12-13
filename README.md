@@ -15,5 +15,8 @@ Part Two: 64097
 Part One: 520135
 Part Two: 72514855
 
+--- Day 4: Scratchcards ---
+Part One: 23941
+Part Two: 5571760
 ```
 
