@@ -20,6 +20,7 @@ fn main() {
         puzzle!(day02, "Cube Conundrum"),
         puzzle!(day03, "Gear Ratios"),
         puzzle!(day04, "Scratchcards"),
+        puzzle!(day05, "If You Give A Seed A Fertilizer"),
     ];
 
     let filename = match env::args().find(|a| a == "--example") {
