@@ -9,7 +9,7 @@ fn parse_input(input: &str) -> Vec<Vec<[u32; 3]>> {
                 .map(|s| {
                     let mut cubes = [0, 0, 0];
                     s.split(", ").for_each(|s| {
-                        let (a, b) = s.split_once(" ").unwrap();
+                        let (a, b) = s.split_once(' ').unwrap();
                         let c = match b {
                             "red" => 0,
                             "green" => 1,

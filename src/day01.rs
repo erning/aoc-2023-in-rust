@@ -27,7 +27,7 @@ pub fn part_two(input: &str) -> u32 {
             "nine",
         ];
         let ch = s.chars().nth(i).unwrap();
-        return if ch.is_numeric() {
+        if ch.is_numeric() {
             ch.to_digit(10)
         } else {
             words
@@ -35,7 +35,7 @@ pub fn part_two(input: &str) -> u32 {
                 .enumerate()
                 .find(|(_, word)| s[i..].starts_with(word))
                 .map(|(j, _)| j as u32 + 1)
-        };
+        }
     }
 
     input

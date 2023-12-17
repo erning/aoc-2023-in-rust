@@ -1,3 +1,4 @@
+#[allow(clippy::type_complexity)]
 fn parse_input(input: &str) -> (Vec<i64>, Vec<Vec<(i64, i64, i64)>>) {
     fn parse_seeds(line: &str) -> Vec<i64> {
         line.split_once(':')
@@ -12,7 +13,7 @@ fn parse_input(input: &str) -> (Vec<i64>, Vec<Vec<(i64, i64, i64)>>) {
 
     let mut maps: Vec<Vec<(i64, i64, i64)>> = vec![];
     let mut m: Vec<(i64, i64, i64)> = vec![];
-    while let Some(line) = lines.next() {
+    for line in lines {
         if line.trim().is_empty() {
             continue;
         }

@@ -5,25 +5,23 @@ fn parse_input(input: &str) -> Vec<Vec<char>> {
 }
 
 // return tuple (number, x, y, width)
-fn parse_numbers(grid: &Vec<Vec<char>>) -> Vec<(u32, usize, usize, usize)> {
-    let h = grid.len();
+fn parse_numbers(grid: &[Vec<char>]) -> Vec<(u32, usize, usize, usize)> {
     let w = grid[0].len();
 
     let mut numbers: Vec<(u32, usize, usize, usize)> = vec![];
-    for y in 0..h {
+    // for y in 0..h {
+    for (y, row) in grid.iter().enumerate() {
         let mut n = 0;
         let mut s = 0;
-        for x in 0..w {
-            let ch = grid[y][x];
+        // for x in 0..w {
+        for (x, ch) in row.iter().enumerate() {
             if ch.is_numeric() {
                 n = n * 10 + ch.to_digit(10).unwrap();
                 s += 1;
-            } else {
-                if s != 0 {
-                    numbers.push((n, x - s, y, s));
-                    n = 0;
-                    s = 0;
-                }
+            } else if s != 0 {
+                numbers.push((n, x - s, y, s));
+                n = 0;
+                s = 0;
             }
         }
         if s != 0 {
@@ -88,7 +86,7 @@ pub fn part_one(input: &str) -> u32 {
             if y < h - 1 && x2 < w && is_symbol(x2, y + 1) {
                 return true;
             }
-            return false;
+            false
         };
 
         if is_adjacent_to_symbol() {

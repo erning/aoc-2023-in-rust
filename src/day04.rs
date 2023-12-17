@@ -9,7 +9,7 @@ fn parse_input(input: &str) -> Vec<Vec<Vec<u32>>> {
                 .trim()
                 .split('|')
                 .map(|s| {
-                    s.trim()
+                    s
                         .split_whitespace()
                         .map(|s| s.parse().unwrap())
                         .collect()
@@ -51,9 +51,12 @@ pub fn part_two(input: &str) -> usize {
         let t = numbers[i];
         let a = (i + 1).min(n);
         let b = (a + p).min(n);
-        for j in a..b {
-            numbers[j] += t;
+        for v in numbers.iter_mut().take(b).skip(a) {
+            *v += t;
         }
+        // for j in a..b {
+        //     numbers[j] += t;
+        // }
     }
     numbers.iter().sum() 
 }
