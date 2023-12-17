@@ -22,5 +22,9 @@ Part Two: 5571760
 --- Day 5: If You Give A Seed A Fertilizer ---
 Part One: 240320250
 Part Two: 28580589
+
+--- Day 6: Wait For It ---
+Part One: 440000
+Part Two: 26187338
 ```
 
