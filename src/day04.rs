@@ -9,10 +9,7 @@ fn parse_input(input: &str) -> Vec<Vec<Vec<u32>>> {
                 .trim()
                 .split('|')
                 .map(|s| {
-                    s
-                        .split_whitespace()
-                        .map(|s| s.parse().unwrap())
-                        .collect()
+                    s.split_whitespace().map(|s| s.parse().unwrap()).collect()
                 })
                 .collect()
         })
@@ -58,7 +55,7 @@ pub fn part_two(input: &str) -> usize {
         //     numbers[j] += t;
         // }
     }
-    numbers.iter().sum() 
+    numbers.iter().sum()
 }
 
 #[cfg(test)]
