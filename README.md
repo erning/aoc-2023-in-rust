@@ -18,5 +18,9 @@ Part Two: 72514855
 --- Day 4: Scratchcards ---
 Part One: 23941
 Part Two: 5571760
+
+--- Day 5: If You Give A Seed A Fertilizer ---
+Part One: 240320250
+Part Two: 28580589
 ```
 
