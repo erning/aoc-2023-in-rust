@@ -26,5 +26,9 @@ Part Two: 28580589
 --- Day 6: Wait For It ---
 Part One: 440000
 Part Two: 26187338
+
+--- Day 7: Camel Cards ---
+Part One: 248559379
+Part Two: 249631254
 ```
 
