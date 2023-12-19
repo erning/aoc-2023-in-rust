@@ -28,6 +28,20 @@ pub fn part_two(input: &str) -> usize {
 
     let time = numbers[0];
     let distance = numbers[1];
+
+    let mut delta = time;
+    let mut t = time / 2;
+    while delta > 0 {
+        if (time - t) * t > distance {
+            delta /= 2;
+            t -= delta;
+        } else {
+            t += delta;
+        }
+    }
+    (time + 1 - t - t) as usize
+
+    /*
     let mut a = 0;
     loop {
         let b = distance / (time - a);
@@ -42,6 +56,7 @@ pub fn part_two(input: &str) -> usize {
         }
     }
     0
+    */
     // (a..time-a).filter(|&t| (time - t) * t > distance).count()
     // (1..time).filter(|&t| (time - t) * t > distance).count()
 }
