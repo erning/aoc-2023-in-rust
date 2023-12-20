@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::collections::HashSet;
 
 fn parse_input(input: &str) -> (&str, HashMap<&str, (&str, &str)>) {
     let mut lines = input.lines();
@@ -32,39 +31,53 @@ pub fn part_one(input: &str) -> usize {
     step
 }
 
+fn gcd(values: &[usize]) -> usize {
+    fn gcd_of_two(mut a: usize, mut b: usize) -> usize {
+        while b != 0 {
+            let remainder = a % b;
+            a = b;
+            b = remainder;
+        }
+        a
+    }
+
+    values[1..].iter().fold(values[0], |a, &b| gcd_of_two(a, b))
+}
+
+fn lcm(values: &[usize]) -> usize {
+    let gcd = gcd(values);
+    values.iter().map(|v| v / gcd).product::<usize>() * gcd
+}
+
 pub fn part_two(input: &str) -> usize {
     let (instructions, network) = parse_input(input);
     let instructions = instructions.as_bytes();
     let n = instructions.len();
 
-    let mut nodes: Vec<&str> = network
+    // i DO think the input is the special case. so the solution is as simple
+    // as least common multiple
+    let steps: Vec<usize> = network
         .keys()
         .filter(|x| x.ends_with('A'))
-        .copied()
+        .map(|&x| {
+            let mut node = x;
+            let mut step = 0;
+            loop {
+                let next = network.get(node).unwrap();
+                node = match instructions[step % n] {
+                    b'L' => next.0,
+                    b'R' => next.1,
+                    _ => panic!(),
+                };
+                step += 1;
+                if node.ends_with('Z') {
+                    break step;
+                }
+            }
+        })
         .collect();
 
-    0
-
-    // let mut step = 0;
-    // let mut done = 0;
-    // while done < nodes.len() {
-    //     let instruction = instructions[step % n];
-    //     done = 0;
-    //     for node in nodes.iter_mut() {
-    //         let next = network.get(node).unwrap();
-    //         *node = match instruction {
-    //             b'L' => next.0,
-    //             b'R' => next.1,
-    //             _ => panic!(),
-    //         };
-    //         if node.ends_with('Z') {
-    //             done += 1;
-    //             println!("{:?} - {:?} {:?}", step, node, done);
-    //         }
-    //     }
-    //     step += 1;
-    // }
-    // step
+    lcm(&steps[..])
 }
 
 #[cfg(test)]

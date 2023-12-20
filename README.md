@@ -30,5 +30,9 @@ Part Two: 26187338
 --- Day 7: Camel Cards ---
 Part One: 248559379
 Part Two: 249631254
+
+--- Day 8: Haunted Wasteland ---
+Part One: 17621
+Part Two: 20685524831999
 ```
 
