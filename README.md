@@ -34,5 +34,9 @@ Part Two: 249631254
 --- Day 8: Haunted Wasteland ---
 Part One: 17621
 Part Two: 20685524831999
+
+--- Day 9: Mirage Maintenance ---
+Part One: 1916822650
+Part Two: 966
 ```
 
