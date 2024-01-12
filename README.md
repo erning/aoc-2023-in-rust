@@ -38,5 +38,9 @@ Part Two: 20685524831999
 --- Day 9: Mirage Maintenance ---
 Part One: 1916822650
 Part Two: 966
+
+--- Day 10: Pipe Maze ---
+Part One: 6717
+Part Two: 381
 ```
 
