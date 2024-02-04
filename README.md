@@ -42,5 +42,8 @@ Part Two: 966
 --- Day 10: Pipe Maze ---
 Part One: 6717
 Part Two: 381
-```
 
+--- Day 11: Cosmic Expansion ---
+Part One: 9312968
+Part Two: 597714117556
+```
