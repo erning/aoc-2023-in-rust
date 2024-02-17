@@ -46,4 +46,8 @@ Part Two: 381
 --- Day 11: Cosmic Expansion ---
 Part One: 9312968
 Part Two: 597714117556
+
+--- Day 12: Hot Springs ---
+Part One: 7191
+Part Two: 6512849198636
 ```
