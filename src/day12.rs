@@ -47,15 +47,13 @@ fn count<'a>(
         result += count(&mask[1..], nums, cache);
     }
     // '#' or '?'
-    if c != b'.' {
-        if s <= mask.len() && !mask[..s].contains(&b'.') {
-            if s < mask.len() {
-                if mask[s] != b'#' {
-                    result += count(&mask[s + 1..], &nums[1..], cache)
-                }
-            } else {
-                result += count(&mask[s..], &nums[1..], cache)
+    if c != b'.' && s <= mask.len() && !mask[..s].contains(&b'.') {
+        if s < mask.len() {
+            if mask[s] != b'#' {
+                result += count(&mask[s + 1..], &nums[1..], cache)
             }
+        } else {
+            result += count(&mask[s..], &nums[1..], cache)
         }
     }
 

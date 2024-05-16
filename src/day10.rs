@@ -146,7 +146,7 @@ mod tests {
 .L--JL--J.
 ..........
 ";
-        assert_eq!(part_two(&input), 4);
+        assert_eq!(part_two(input), 4);
     }
 
     #[test]
@@ -163,7 +163,7 @@ L--J.L7...LJS7F-7L7.
 ....FJL-7.||.||||...
 ....L---J.LJ.LJLJ...
 ";
-        assert_eq!(part_two(&input), 8);
+        assert_eq!(part_two(input), 8);
     }
 
     #[test]
@@ -180,6 +180,6 @@ L---JF-JLJ.||-FJLJJ7
 L.L7LFJ|||||FJL7||LJ
 L7JLJL-JLJLJL--JLJ.L
 ";
-        assert_eq!(part_two(&input), 10);
+        assert_eq!(part_two(input), 10);
     }
 }

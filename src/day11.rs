@@ -14,7 +14,7 @@ fn parse_input(input: &str) -> Vec<(usize, usize)> {
         .collect()
 }
 
-fn expaned_distance(galaxies: &Vec<(usize, usize)>, expand: i64) -> i64 {
+fn expaned_distance(galaxies: &[(usize, usize)], expand: i64) -> i64 {
     let (w, h) = galaxies
         .iter()
         .fold((0, 0), |(w, h), &(x, y)| (w.max(x + 1), h.max(y + 1)));
