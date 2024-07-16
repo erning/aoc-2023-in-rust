@@ -69,6 +69,6 @@ mod tests {
             zoneight234
             7pqrstsixteen
         ";
-        assert_eq!(part_two(input), 281);
+        assert_eq!(part_two(&input), 281);
     }
 }
