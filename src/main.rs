@@ -28,6 +28,7 @@ fn main() {
         puzzle!(day10, "Pipe Maze"),
         puzzle!(day11, "Cosmic Expansion"),
         puzzle!(day12, "Hot Springs"),
+        puzzle!(day13, "Point of Incidence"),
     ];
 
     let filename = match env::args().find(|a| a == "--example") {

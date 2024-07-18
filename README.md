@@ -50,4 +50,8 @@ Part Two: 597714117556
 --- Day 12: Hot Springs ---
 Part One: 7191
 Part Two: 6512849198636
+
+--- Day 13: Point of Incidence ---
+Part One: 34889
+Part Two: 34224
 ```
