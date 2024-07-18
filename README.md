@@ -54,4 +54,8 @@ Part Two: 6512849198636
 --- Day 13: Point of Incidence ---
 Part One: 34889
 Part Two: 34224
+
+--- Day 14: Parabolic Reflector Dish ---
+Part One: 108144
+Part Two: 108404
 ```
