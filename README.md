@@ -58,4 +58,8 @@ Part Two: 34224
 --- Day 14: Parabolic Reflector Dish ---
 Part One: 108144
 Part Two: 108404
+
+--- Day 15: Lens Library ---
+Part One: 494980
+Part Two: 247933
 ```
