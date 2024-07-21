@@ -62,4 +62,8 @@ Part Two: 108404
 --- Day 15: Lens Library ---
 Part One: 494980
 Part Two: 247933
+
+--- Day 16: The Floor Will Be Lava ---
+Part One: 7242
+Part Two: 7572
 ```

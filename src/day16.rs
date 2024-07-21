@@ -109,9 +109,33 @@ pub fn part_one(input: &str) -> usize {
     while contraption.tick() > 0 {}
     contraption.energized.len()
 }
-
-pub fn part_two(input: &str) -> u32 {
-    0
+pub fn part_two(input: &str) -> usize {
+    let grid = parse_input(input);
+    let w = grid[0].len() as i32;
+    let h = grid.len() as i32;
+    let mut starts: Vec<(i32, i32, char)> = vec![];
+    for i in 0..w {
+        starts.push((i, -1, 'S'));
+        starts.push((i, h, 'N'));
+    }
+    for i in 0..h {
+        starts.push((-1, i, 'E'));
+        starts.push((w, i, 'W'));
+    }
+    starts
+        .into_iter()
+        .map(|start| {
+            let mut contraption = Contraption {
+                grid: grid.clone(),
+                beams: vec![start],
+                energized: HashSet::new(),
+                track: HashSet::new(),
+            };
+            while contraption.tick() > 0 {}
+            contraption.energized.len()
+        })
+        .max()
+        .unwrap()
 }
 
 #[cfg(test)]
@@ -123,6 +147,6 @@ mod tests {
     fn example() {
         let input = read_example(16);
         assert_eq!(part_one(&input), 46);
-        assert_eq!(part_two(&input), 0);
+        assert_eq!(part_two(&input), 51);
     }
 }
