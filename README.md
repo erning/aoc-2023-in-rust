@@ -66,4 +66,8 @@ Part Two: 247933
 --- Day 16: The Floor Will Be Lava ---
 Part One: 7242
 Part Two: 7572
+
+--- Day 17: Clumsy Crucible ---
+Part One: 724
+Part Two: 877
 ```
