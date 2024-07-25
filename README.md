@@ -70,4 +70,8 @@ Part Two: 7572
 --- Day 17: Clumsy Crucible ---
 Part One: 724
 Part Two: 877
+
+--- Day 18: Lavaduct Lagoon ---
+Part One: 50603
+Part Two: 96556251590677
 ```
