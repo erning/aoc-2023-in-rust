@@ -1,11 +1,15 @@
 use std::collections::HashMap;
 
-type Value = i64;
-type Rule<'a> = (&'a str, &'a str, Value, &'a str);
-type Workflow<'a> = (&'a str, Vec<Rule<'a>>);
+type Value = i32;
+type Condition<'a> = (&'a str, &'a str, Value);
+type Rule<'a> = (Option<Condition<'a>>, &'a str);
+type Workflows<'a> = HashMap<&'a str, Vec<Rule<'a>>>;
 type RatingsPart<'a> = HashMap<&'a str, Value>;
 
-fn parse_workflows(input: &str) -> Vec<Workflow> {
+// (x, m, a, s)
+type RatingsRange = [(Value, Value); 4];
+
+fn parse_workflows(input: &str) -> Workflows {
     fn parse_rules(input: &str) -> Vec<Rule> {
         // a<2006:qkq,m>2090:A,rfg
         input
@@ -15,12 +19,14 @@ fn parse_workflows(input: &str) -> Vec<Workflow> {
                 // a<2006:qkq
                 let s: Vec<&str> = rule.split(':').collect();
                 if s.len() == 1 {
-                    ("", "", 0, s[0])
+                    (None, s[0])
                 } else {
                     (
-                        &s[0][0..1], // var name
-                        &s[0][1..2], // condition '<' or '>'
-                        s[0][2..].parse::<Value>().unwrap(),
+                        Some((
+                            &s[0][0..1], // var name
+                            &s[0][1..2], // compare '<' or '>'
+                            s[0][2..].parse::<Value>().unwrap(),
+                        )),
                         s[1],
                     )
                 }
@@ -57,24 +63,22 @@ fn parse_parts(input: &str) -> Vec<RatingsPart> {
         .collect()
 }
 
-fn parse_input(input: &str) -> (Vec<Workflow>, Vec<RatingsPart>) {
+fn parse_input(input: &str) -> (Workflows, Vec<RatingsPart>) {
     let s: Vec<&str> = input.trim().split("\n\n").collect();
     (parse_workflows(s[0]), parse_parts(s[1]))
 }
 
-fn process(
-    ratings: &RatingsPart,
-    workflows: &HashMap<&str, Vec<Rule>>,
-) -> bool {
+fn process(ratings: &RatingsPart, workflows: &Workflows) -> bool {
     let mut name = "in";
     while let Some(rules) = workflows.get(name) {
-        for (var, condition, value, next) in rules {
-            if var.is_empty() {
+        for (condition, next) in rules {
+            if condition.is_none() {
                 name = next;
                 break;
             }
-            let rating = ratings.get(var).unwrap();
-            if match *condition {
+            let (var, cmp, value) = condition.unwrap();
+            let &rating = ratings.get(var).unwrap();
+            if match cmp {
                 ">" => rating > value,
                 "<" => rating < value,
                 _ => panic!(),
@@ -94,8 +98,6 @@ fn process(
 
 pub fn part_one(input: &str) -> Value {
     let (workflows, parts) = parse_input(input);
-    let workflows: HashMap<&str, Vec<Rule>> = workflows.into_iter().collect();
-
     parts
         .iter()
         .filter(|ratings| process(ratings, &workflows))
@@ -103,8 +105,65 @@ pub fn part_one(input: &str) -> Value {
         .sum()
 }
 
-pub fn part_two(input: &str) -> Value {
-    0
+fn dfs(
+    workflows: &Workflows,
+    name: &str,
+    mut ratings: RatingsRange,
+    ranges: &mut Vec<RatingsRange>,
+) {
+    if name == "A" {
+        ranges.push(ratings);
+        return;
+    }
+    if name == "R" {
+        return;
+    }
+    let rules = workflows.get(name).unwrap();
+    for (condition, next) in rules.iter() {
+        let mut next_ratings = ratings;
+        if let Some((var, cmp, value)) = condition {
+            let i = match *var {
+                "x" => 0,
+                "m" => 1,
+                "a" => 2,
+                "s" => 3,
+                _ => panic!(),
+            };
+            match *cmp {
+                "<" => {
+                    next_ratings[i].1 = next_ratings[i].1.min(*value) - 1;
+                    ratings[i].0 = ratings[i].0.max(*value);
+                }
+                ">" => {
+                    next_ratings[i].0 = next_ratings[i].0.max(*value) + 1;
+                    ratings[i].1 = ratings[i].1.min(*value);
+                }
+                _ => panic!(),
+            }
+        }
+        dfs(workflows, next, next_ratings, ranges)
+    }
+}
+
+pub fn part_two(input: &str) -> usize {
+    let (workflows, _) = parse_input(input);
+    let mut ranges: Vec<RatingsRange> = vec![];
+    dfs(
+        &workflows,
+        "in",
+        [(1, 4000), (1, 4000), (1, 4000), (1, 4000)],
+        &mut ranges,
+    );
+    ranges
+        .into_iter()
+        .map(|ratings| {
+            ratings
+                .into_iter()
+                .map(|(a, b)| b - a + 1)
+                .map(|v| v as usize)
+                .product::<usize>()
+        })
+        .sum()
 }
 
 #[cfg(test)]
