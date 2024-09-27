@@ -86,7 +86,7 @@ mod tests {
             999999999991\n\
             999999999991\n\
             999999999991";
-        assert_eq!(part_two(&input), 71);
+        assert_eq!(part_two(input), 71);
     }
 
     #[test]
