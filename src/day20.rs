@@ -39,7 +39,7 @@ impl<'a> Module<'a> {
             } => name,
         }
     }
-    fn outputs(&self) -> &Vec<&'a str> {
+    fn outputs(&self) -> &[&'a str] {
         match self {
             Module::Broadcaster { name: _, outputs } => outputs,
             Module::FlipFlop {
@@ -94,12 +94,12 @@ fn parse_input(input: &str) -> HashMap<&str, Module> {
         .flat_map(|a| {
             a.outputs()
                 .iter()
-                .filter_map(|b| modules.get(b))
+                .filter_map(|&b| modules.get(b))
                 .map(|b| (a.name(), b.name()))
         })
         .collect::<Vec<(&str, &str)>>()
         .iter()
-        .for_each(|(a, b)| {
+        .for_each(|&(a, b)| {
             if let Some(Module::Conjunction {
                 name: _,
                 outputs: _,
@@ -129,7 +129,7 @@ pub fn part_one(input: &str) -> i32 {
             }
             match modules.get_mut(name) {
                 Some(Module::Broadcaster { name, outputs }) => {
-                    outputs.iter().for_each(|output| {
+                    outputs.iter().for_each(|&output| {
                         queue.push_back((name, pulse, output));
                     })
                 }
@@ -144,7 +144,7 @@ pub fn part_one(input: &str) -> i32 {
                             *is_on = !*is_on;
                             let p =
                                 if *is_on { PULSE_HIGH } else { PULSE_LOW };
-                            outputs.iter().for_each(|output| {
+                            outputs.iter().for_each(|&output| {
                                 queue.push_back((name, p, output));
                             });
                         }
@@ -166,7 +166,7 @@ pub fn part_one(input: &str) -> i32 {
                     } else {
                         PULSE_HIGH
                     };
-                    outputs.iter().for_each(|output| {
+                    outputs.iter().for_each(|&output| {
                         queue.push_back((name, p, output));
                     })
                 }
