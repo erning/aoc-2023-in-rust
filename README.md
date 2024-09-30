@@ -78,4 +78,8 @@ Part Two: 96556251590677
 --- Day 19: Aplenty ---
 Part One: 401674
 Part Two: 134906204068564
+
+--- Day 20: Pulse Propagation ---
+Part One: 832957356
+Part Two: 240162699605221
 ```

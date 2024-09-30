@@ -1,184 +1,243 @@
+use core::panic;
 use std::collections::{HashMap, VecDeque};
-use std::convert::From;
 
-type Pulse = bool;
-const PULSE_LOW: Pulse = false;
-const PULSE_HIGH: Pulse = true;
+#[derive(Debug, PartialEq, Clone, Copy)]
+enum Pulse {
+    Low,
+    High,
+}
 
 #[derive(Debug)]
-enum Module<'a> {
-    Broadcaster {
-        name: &'a str,
-        outputs: Vec<&'a str>,
-    },
-    FlipFlop {
-        name: &'a str,
-        outputs: Vec<&'a str>,
-        is_on: bool,
-    },
-    Conjunction {
-        name: &'a str,
-        outputs: Vec<&'a str>,
-        memory: HashMap<&'a str, Pulse>,
-    },
+enum ModuleType {
+    Broadcaster,
+    FlipFlop,
+    Conjunction,
 }
 
-impl<'a> Module<'a> {
-    fn name(&self) -> &'a str {
-        match self {
-            Module::Broadcaster { name, outputs: _ } => name,
-            Module::FlipFlop {
-                name,
-                outputs: _,
-                is_on: _,
-            } => name,
-            Module::Conjunction {
-                name,
-                outputs: _,
-                memory: _,
-            } => name,
-        }
-    }
-    fn outputs(&self) -> &[&'a str] {
-        match self {
-            Module::Broadcaster { name: _, outputs } => outputs,
-            Module::FlipFlop {
-                name: _,
-                outputs,
-                is_on: _,
-            } => outputs,
-            Module::Conjunction {
-                name: _,
-                outputs,
-                memory: _,
-            } => outputs,
-        }
-    }
-}
-
-impl<'a> From<&'a str> for Module<'a> {
-    fn from(value: &'a str) -> Module<'a> {
-        if let Some((a, b)) = value.split_once("->") {
-            let outputs: Vec<&'a str> =
-                b.split(',').map(|s| s.trim()).collect();
-            match &a[0..1] {
-                "%" => Module::FlipFlop {
-                    name: a[1..].trim(),
-                    outputs,
-                    is_on: false,
-                },
-                "&" => Module::Conjunction {
-                    name: a[1..].trim(),
-                    outputs,
-                    memory: HashMap::new(),
-                },
-                _ => Module::Broadcaster {
-                    name: "broadcaster",
-                    outputs,
-                },
-            }
-        } else {
-            panic!("unsupported input")
-        }
-    }
+#[derive(Debug)]
+struct Module<'a> {
+    name: &'a str,
+    mtype: ModuleType,
+    outputs: Vec<&'a str>,
+    inputs: Vec<&'a str>,
 }
 
 fn parse_input(input: &str) -> HashMap<&str, Module> {
     let mut modules: HashMap<&str, Module> = input
         .lines()
-        .map(Module::from)
-        .map(|m| (m.name(), m))
+        .map(|line| {
+            if let Some((lhs, rhs)) = line.split_once("->") {
+                let outputs: Vec<&str> =
+                    rhs.split(',').map(|s| s.trim()).collect();
+                let mtype = match &lhs[..1] {
+                    "%" => ModuleType::FlipFlop,
+                    "&" => ModuleType::Conjunction,
+                    _ => ModuleType::Broadcaster,
+                };
+                let name = match mtype {
+                    ModuleType::Broadcaster => lhs.trim(),
+                    _ => lhs[1..].trim(),
+                };
+                Module {
+                    name,
+                    mtype,
+                    outputs,
+                    inputs: vec![],
+                }
+            } else {
+                panic!()
+            }
+        })
+        .map(|module| (module.name, module))
         .collect();
+
     modules
         .values()
         .flat_map(|a| {
-            a.outputs()
+            a.outputs
                 .iter()
                 .filter_map(|&b| modules.get(b))
-                .map(|b| (a.name(), b.name()))
+                .map(|b| (a.name, b.name))
         })
         .collect::<Vec<(&str, &str)>>()
         .iter()
         .for_each(|&(a, b)| {
-            if let Some(Module::Conjunction {
-                name: _,
-                outputs: _,
-                memory,
-            }) = modules.get_mut(b)
-            {
-                memory.insert(a, PULSE_LOW);
+            if let Some(module) = modules.get_mut(b) {
+                module.inputs.push(a)
             }
         });
+
     modules
 }
 
-pub fn part_one(input: &str) -> i32 {
-    let mut modules = parse_input(input);
+fn init_flags<'a>(
+    modules: &'a HashMap<&str, Module>,
+) -> HashMap<&'a str, bool> {
+    modules
+        .iter()
+        .filter(|(_, module)| matches!(module.mtype, ModuleType::FlipFlop))
+        .map(|(name, _)| (*name, false))
+        .collect()
+}
 
-    let times = 1000;
-    let mut low = 0;
-    let mut high = 0;
+fn init_memories<'a>(
+    modules: &'a HashMap<&str, Module>,
+) -> HashMap<&'a str, HashMap<&'a str, Pulse>> {
+    modules
+        .iter()
+        .filter(|(_, module)| matches!(module.mtype, ModuleType::Conjunction))
+        .map(|(name, module)| {
+            (
+                *name,
+                module
+                    .inputs
+                    .iter()
+                    .map(|input| (*input, Pulse::Low))
+                    .collect(),
+            )
+        })
+        .collect()
+}
 
-    for _ in 0..times {
-        let mut queue: VecDeque<(&str, Pulse, &str)> = VecDeque::new();
-        queue.push_back(("button", PULSE_LOW, "broadcaster"));
-        while let Some((from, pulse, name)) = queue.pop_front() {
-            match pulse {
-                PULSE_HIGH => high += 1,
-                PULSE_LOW => low += 1,
+fn passthrough(
+    prev: &str,
+    pulse: Pulse,
+    name: &str,
+    modules: &HashMap<&str, Module>,
+    flags: &mut HashMap<&str, bool>,
+    memories: &mut HashMap<&str, HashMap<&str, Pulse>>,
+) -> Option<Pulse> {
+    if !modules.contains_key(name) {
+        return None;
+    }
+    let module = modules.get(name).unwrap();
+    match module.mtype {
+        ModuleType::Broadcaster => Some(pulse),
+        ModuleType::FlipFlop => match pulse {
+            Pulse::High => None,
+            Pulse::Low => {
+                let flag = flags.get_mut(name).unwrap();
+                let pulse = if *flag { Pulse::Low } else { Pulse::High };
+                *flag = !*flag;
+                Some(pulse)
             }
-            match modules.get_mut(name) {
-                Some(Module::Broadcaster { name, outputs }) => {
-                    outputs.iter().for_each(|&output| {
+        },
+        ModuleType::Conjunction => {
+            let memory = memories.get_mut(name).unwrap();
+            let rememered_pulse = memory.get_mut(prev).unwrap();
+            *rememered_pulse = pulse;
+            let pulse = if memory.values().all(|v| *v == Pulse::High) {
+                Pulse::Low
+            } else {
+                Pulse::High
+            };
+            Some(pulse)
+        }
+    }
+}
+
+fn lcm(nums: &[usize]) -> usize {
+    if nums.len() == 1 {
+        return nums[0];
+    }
+    let a = nums[0];
+    let b = lcm(&nums[1..]);
+    a * b / gcd_of_two_numbers(a, b)
+}
+
+fn gcd_of_two_numbers(a: usize, b: usize) -> usize {
+    if b == 0 {
+        return a;
+    }
+    gcd_of_two_numbers(b, a % b)
+}
+
+pub fn part_one(input: &str) -> u32 {
+    let modules = parse_input(input);
+    let mut flags = init_flags(&modules);
+    let mut memories = init_memories(&modules);
+
+    let mut lo = 0;
+    let mut hi = 0;
+
+    for _ in 0..1000 {
+        let mut queue: VecDeque<(&str, Pulse, &str)> = VecDeque::new();
+        queue.push_back(("button", Pulse::Low, "broadcaster"));
+        while let Some((prev, pulse, name)) = queue.pop_front() {
+            match pulse {
+                Pulse::Low => lo += 1,
+                Pulse::High => hi += 1,
+            }
+            let pulse = passthrough(
+                prev,
+                pulse,
+                name,
+                &modules,
+                &mut flags,
+                &mut memories,
+            );
+            if let Some(pulse) = pulse {
+                modules.get(name).unwrap().outputs.iter().for_each(
+                    |output| {
                         queue.push_back((name, pulse, output));
-                    })
-                }
-                Some(Module::FlipFlop {
-                    name,
-                    outputs,
-                    is_on,
-                }) => {
-                    match pulse {
-                        PULSE_HIGH => {}
-                        PULSE_LOW => {
-                            *is_on = !*is_on;
-                            let p =
-                                if *is_on { PULSE_HIGH } else { PULSE_LOW };
-                            outputs.iter().for_each(|&output| {
-                                queue.push_back((name, p, output));
-                            });
-                        }
-                    };
-                }
-                Some(Module::Conjunction {
-                    name,
-                    outputs,
-                    memory,
-                }) => {
-                    match memory.get_mut(from) {
-                        None => {
-                            memory.insert(from, pulse);
-                        }
-                        Some(v) => *v = pulse,
-                    }
-                    let p = if memory.values().all(|&v| v == PULSE_HIGH) {
-                        PULSE_LOW
-                    } else {
-                        PULSE_HIGH
-                    };
-                    outputs.iter().for_each(|&output| {
-                        queue.push_back((name, p, output));
-                    })
-                }
-                _ => {}
+                    },
+                );
             }
         }
     }
-    low * high
+
+    lo * hi
 }
 
-pub fn part_two(input: &str) -> i32 {
-    0
+pub fn part_two(input: &str) -> usize {
+    let modules = parse_input(input);
+    let mut flags = init_flags(&modules);
+    let mut memories = init_memories(&modules);
+
+    let feed: &str = modules
+        .values()
+        .filter(|m| m.outputs.contains(&"rx"))
+        .map(|m| m.name)
+        .next()
+        .unwrap();
+
+    let mut feeds: HashMap<&str, usize> = modules
+        .values()
+        .filter(|m| m.outputs.contains(&feed))
+        .map(|m| (m.name, 0))
+        .collect();
+
+    let mut pressed = 0;
+
+    while feeds.values().any(|v| *v == 0) {
+        pressed += 1;
+        let mut queue: VecDeque<(&str, Pulse, &str)> = VecDeque::new();
+        queue.push_back(("button", Pulse::Low, "broadcaster"));
+        while let Some((prev, pulse, name)) = queue.pop_front() {
+            if pulse == Pulse::Low {
+                if let Some(cycle) = feeds.get_mut(name) {
+                    *cycle = pressed
+                }
+            }
+            let pulse = passthrough(
+                prev,
+                pulse,
+                name,
+                &modules,
+                &mut flags,
+                &mut memories,
+            );
+            if let Some(pulse) = pulse {
+                modules.get(name).unwrap().outputs.iter().for_each(
+                    |output| {
+                        queue.push_back((name, pulse, output));
+                    },
+                );
+            }
+        }
+    }
+    let cycles: Vec<usize> = feeds.values().copied().collect();
+    lcm(&cycles)
 }
 
 #[cfg(test)]
@@ -187,36 +246,9 @@ mod tests {
     use crate::read_example;
 
     #[test]
-    fn modules_from_str() {
-        let cases = [
-            "broadcaster -> a",
-            "%a -> inv, con",
-            "&inv -> b",
-            "%b -> con",
-            "&con -> output",
-        ];
-        cases.iter().for_each(|&s| {
-            let m = Module::from(s);
-            println!("{:?}", m);
-        });
-    }
-
-    #[test]
-    fn test_parse_input() {
-        let input = "broadcaster -> a, b, c\n\
-            %a -> b\n\
-            %b -> c\n\
-            %c -> inv\n\
-            &inv -> a";
-        let modules = parse_input(input);
-        println!("{:?}", modules);
-    }
-
-    #[test]
     fn example() {
         let input = read_example(20);
         assert_eq!(part_one(&input), 32000000);
-        assert_eq!(part_two(&input), 0);
     }
 
     #[test]
