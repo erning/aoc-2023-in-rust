@@ -1,6 +1,6 @@
 # aoc-2023-in-rust
 
-```
+```text
 $ cargo run --release -- --time
 
 --- Day 1: Trebuchet?! ---
