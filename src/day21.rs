@@ -12,25 +12,31 @@ fn parse_input(input: &str) -> Parsed {
     let mut rocks: HashSet<(i32, i32)> = HashSet::new();
     let mut w: i32 = 0;
     let mut h: i32 = 0;
-    input.lines().enumerate().for_each(|(x, s)| {
-        s.chars().enumerate().for_each(|(y, c)| {
-            match c {
-                '#' => {
-                    rocks.insert((x as i32, y as i32));
-                }
-                'S' => {
-                    start = (x as i32, y as i32);
-                }
-                _ => {}
-            };
-            h = h.max(y as i32)
+    input
+        .lines()
+        .enumerate()
+        .map(|(x, s)| (x as i32, s))
+        .for_each(|(x, s)| {
+            s.chars().enumerate().map(|(y, c)| (y as i32, c)).for_each(
+                |(y, c)| {
+                    match c {
+                        '#' => {
+                            rocks.insert((x, y));
+                        }
+                        'S' => {
+                            start = (x, y);
+                        }
+                        _ => {}
+                    };
+                    h = h.max(y)
+                },
+            );
+            w = w.max(x)
         });
-        w = w.max(x as i32)
-    });
     Parsed { start, rocks, w, h }
 }
 
-fn garden_plots(parsed: Parsed, steps: usize) -> usize {
+fn garden_plots(parsed: &Parsed, steps: usize) -> usize {
     let mut plots: HashSet<(i32, i32)> = HashSet::new();
     plots.insert(parsed.start);
     for _ in 0..steps {
@@ -54,10 +60,12 @@ fn garden_plots(parsed: Parsed, steps: usize) -> usize {
 
 pub fn part_one(input: &str) -> usize {
     let parsed = parse_input(input);
-    garden_plots(parsed, 64)
+    garden_plots(&parsed, 64)
 }
 
-pub fn part_two(input: &str) -> u32 {
+pub fn part_two(input: &str) -> usize {
+    let parsed = parse_input(input);
+    // garden_plots(&parsed, 26501365)
     0
 }
 
@@ -70,15 +78,12 @@ mod tests {
     fn example() {
         let input = read_example(21);
         let parsed = parse_input(&input);
-        let count = garden_plots(parsed, 6);
-        assert_eq!(count, 16);
-
-        // In exactly 6 steps, he can still reach 16 garden plots.
-        // In exactly 10 steps, he can reach any of 50 garden plots.
-        // In exactly 50 steps, he can reach 1594 garden plots.
-        // In exactly 100 steps, he can reach 6536 garden plots.
-        // In exactly 500 steps, he can reach 167004 garden plots.
-        // In exactly 1000 steps, he can reach 668697 garden plots.
-        // In exactly 5000 steps, he can reach 16733044 garden plots.
+        assert_eq!(garden_plots(&parsed, 6), 16);
+        assert_eq!(garden_plots(&parsed, 10), 50);
+        assert_eq!(garden_plots(&parsed, 50), 1594);
+        assert_eq!(garden_plots(&parsed, 100), 6536);
+        assert_eq!(garden_plots(&parsed, 500), 167004);
+        assert_eq!(garden_plots(&parsed, 1000), 668697);
+        assert_eq!(garden_plots(&parsed, 5000), 16733044);
     }
 }
