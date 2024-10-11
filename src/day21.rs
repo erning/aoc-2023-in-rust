@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use std::collections::VecDeque;
 
 struct Garden {
     start: (i32, i32),
@@ -33,27 +34,35 @@ fn parse_input(input: &str) -> Garden {
             );
             w = w.max(x)
         });
+    w += 1;
+    h += 1;
     Garden { start, rocks, w, h }
 }
 
 fn count_plots(garden: &Garden, steps: usize) -> usize {
     let mut plots: HashSet<(i32, i32)> = HashSet::new();
-    plots.insert(garden.start);
-    for _ in 0..steps {
-        let mut new_plots: HashSet<(i32, i32)> = HashSet::new();
-        for (x, y) in plots.iter() {
-            for (dx, dy) in [(0, -1), (1, 0), (0, 1), (-1, 0)] {
-                let (x, y) = (x + dx, y + dy);
-                if x < 0 || x >= garden.w || y < 0 || y >= garden.h {
-                    continue;
-                }
-                if garden.rocks.contains(&(x, y)) {
-                    continue;
-                }
-                new_plots.insert((x, y));
-            }
+    let mut visited: HashSet<(i32, i32)> = HashSet::new();
+    let mut queue: VecDeque<(usize, (i32, i32))> = VecDeque::new();
+    queue.push_back((steps, garden.start));
+    while let Some((steps, (x, y))) = queue.pop_front() {
+        if visited.contains(&(x, y)) {
+            continue;
         }
-        plots = new_plots;
+        visited.insert((x, y));
+        if steps % 2 == 0 {
+            plots.insert((x, y));
+        }
+        if steps == 0 {
+            continue;
+        }
+        for (x, y) in [(x, y - 1), (x + 1, y), (x, y + 1), (x - 1, y)] {
+            let cx = ((x % garden.w) + (garden.w)) % garden.w;
+            let cy = ((y % garden.h) + (garden.h)) % garden.h;
+            if garden.rocks.contains(&(cx, cy)) {
+                continue;
+            }
+            queue.push_back((steps - 1, (x, y)));
+        }
     }
     plots.len()
 }
