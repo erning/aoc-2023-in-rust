@@ -40,17 +40,16 @@ fn parse_input(input: &str) -> Garden {
 }
 
 fn count_plots(garden: &Garden, steps: usize) -> usize {
-    let mut plots: HashSet<(i32, i32)> = HashSet::new();
+    let mut plots: Vec<(i32, i32)> = Vec::new();
     let mut visited: HashSet<(i32, i32)> = HashSet::new();
     let mut queue: VecDeque<(usize, (i32, i32))> = VecDeque::new();
     queue.push_back((steps, garden.start));
     while let Some((steps, (x, y))) = queue.pop_front() {
-        if visited.contains(&(x, y)) {
+        if !visited.insert((x, y)) {
             continue;
         }
-        visited.insert((x, y));
         if steps % 2 == 0 {
-            plots.insert((x, y));
+            plots.push((x, y));
         }
         if steps == 0 {
             continue;
@@ -74,8 +73,8 @@ pub fn part_one(input: &str) -> usize {
 
 pub fn part_two(input: &str) -> usize {
     let garden = parse_input(input);
+    count_plots(&garden, 2000)
     // count_plots(&garden, 26501365)
-    0
 }
 
 #[cfg(test)]
