@@ -78,79 +78,87 @@ fn _part_two(garden: &Garden, steps: usize) -> usize {
     let d = steps / w;
     let m = steps % w;
     let v = 5 + d as i32 % 2;
-    // let v = d as i32 + 1;
     let s = steps.min(w * (v as usize - 1) + m);
-    // let s = steps;
     let plots = count_plots(garden, s);
-    if steps == s {
+    if steps <= s {
         return plots.len();
     }
-
-    println!("==== {} -> {} {} {}", steps, s, d, m);
+    println!("==== {} -> s={}, d={}, m={}", steps, s, d, m);
 
     let mut boxes: HashMap<(i32, i32), usize> = HashMap::new();
+    plots
+        .iter()
+        .map(|(x, y)| {
+            (
+                if x < &0 {
+                    (x + 1) / garden.w - 1
+                } else {
+                    x / garden.w
+                },
+                if y < &0 {
+                    (y + 1) / garden.h - 1
+                } else {
+                    y / garden.h
+                },
+            )
+        })
+        .for_each(|k| {
+            if let Some(count) = boxes.get_mut(&k) {
+                *count += 1;
+            } else {
+                boxes.insert(k, 1);
+            }
+        });
+
     for j in -v..=v {
         for i in -v..=v {
-            let c = plots
-                .iter()
-                .filter(|(x, y)| {
-                    *x >= i * garden.w
-                        && *x < (i + 1) * garden.w
-                        && *y >= j * garden.h
-                        && *y < (j + 1) * garden.h
-                })
-                .count();
-            boxes.insert((i, j), c);
-        }
-    }
-    for j in -v..=v {
-        for i in -v..=v {
-            print!("{:5}, ", boxes.get(&(i, j)).unwrap());
+            print!("{:5}, ", boxes.get(&(i, j)).unwrap_or(&0));
         }
         println!();
     }
-    let c1 = boxes.get(&(0, 0)).unwrap();
-    let c2 = boxes.get(&(0, 1)).unwrap();
+
+    let c1 = boxes.get(&(0, 0)).unwrap_or(&0);
+    let c2 = boxes.get(&(0, 1)).unwrap_or(&0);
     println!("c={}, {}", c1, c2);
 
-    let n1 = boxes.get(&(0, -v)).unwrap();
-    let n2 = boxes.get(&(0, -v + 1)).unwrap();
-    let n3 = boxes.get(&(0, -v + 2)).unwrap();
+    let n1 = boxes.get(&(0, -v)).unwrap_or(&0);
+    let n2 = boxes.get(&(0, -v + 1)).unwrap_or(&0);
+    let n3 = boxes.get(&(0, -v + 2)).unwrap_or(&0);
     println!("n={}, {}, {}", n1, n2, n3);
 
-    let s1 = boxes.get(&(0, v)).unwrap();
-    let s2 = boxes.get(&(0, v - 1)).unwrap();
-    let s3 = boxes.get(&(0, v - 2)).unwrap();
+    let s1 = boxes.get(&(0, v)).unwrap_or(&0);
+    let s2 = boxes.get(&(0, v - 1)).unwrap_or(&0);
+    let s3 = boxes.get(&(0, v - 2)).unwrap_or(&0);
     println!("s={}, {}, {}", s1, s2, s3);
 
-    let e1 = boxes.get(&(v, 0)).unwrap();
-    let e2 = boxes.get(&(v - 1, 0)).unwrap();
-    let e3 = boxes.get(&(v - 2, 0)).unwrap();
+    let e1 = boxes.get(&(v, 0)).unwrap_or(&0);
+    let e2 = boxes.get(&(v - 1, 0)).unwrap_or(&0);
+    let e3 = boxes.get(&(v - 2, 0)).unwrap_or(&0);
     println!("e={}, {}, {}", e1, e2, e3);
 
-    let w1 = boxes.get(&(-v, 0)).unwrap();
-    let w2 = boxes.get(&(-v + 1, 0)).unwrap();
-    let w3 = boxes.get(&(-v + 2, 0)).unwrap();
+    let w1 = boxes.get(&(-v, 0)).unwrap_or(&0);
+    let w2 = boxes.get(&(-v + 1, 0)).unwrap_or(&0);
+    let w3 = boxes.get(&(-v + 2, 0)).unwrap_or(&0);
     println!("w={}, {}, {}", w1, w2, w3);
 
-    let ne1 = boxes.get(&(1, -v + 1)).unwrap();
-    let ne2 = boxes.get(&(1, -v + 2)).unwrap();
-    let ne3 = boxes.get(&(1, -v + 3)).unwrap();
+    let ne1 = boxes.get(&(1, -v + 1)).unwrap_or(&0);
+    let ne2 = boxes.get(&(1, -v + 2)).unwrap_or(&0);
+    let ne3 = boxes.get(&(1, -v + 3)).unwrap_or(&0);
     println!("ne={}, {}, {}", ne1, ne2, ne3);
 
-    let se1 = boxes.get(&(1, v - 1)).unwrap();
-    let se2 = boxes.get(&(1, v - 2)).unwrap();
-    let se3 = boxes.get(&(1, v - 3)).unwrap();
+    let se1 = boxes.get(&(1, v - 1)).unwrap_or(&0);
+    let se2 = boxes.get(&(1, v - 2)).unwrap_or(&0);
+    let se3 = boxes.get(&(1, v - 3)).unwrap_or(&0);
     println!("se={}, {}, {}", se1, se2, se3);
 
-    let nw1 = boxes.get(&(-1, -v + 1)).unwrap();
-    let nw2 = boxes.get(&(-1, -v + 2)).unwrap();
-    let nw3 = boxes.get(&(-1, -v + 3)).unwrap();
+    let nw1 = boxes.get(&(-1, -v + 1)).unwrap_or(&0);
+    let nw2 = boxes.get(&(-1, -v + 2)).unwrap_or(&0);
+    let nw3 = boxes.get(&(-1, -v + 3)).unwrap_or(&0);
     println!("nw={}, {}, {}", nw1, nw2, nw3);
 
-    let sw1 = boxes.get(&(-1, v - 1)).unwrap();
-    let sw2 = boxes.get(&(-1, v - 2)).unwrap();
-    let sw3 = boxes.get(&(-1, v - 3)).unwrap();
+    let sw1 = boxes.get(&(-1, v - 1)).unwrap_or(&0);
+    let sw2 = boxes.get(&(-1, v - 2)).unwrap_or(&0);
+    let sw3 = boxes.get(&(-1, v - 3)).unwrap_or(&0);
     println!("sw={}, {}, {}", sw1, sw2, sw3);
 
     let mut answer = 0;
@@ -166,17 +174,18 @@ fn _part_two(garden: &Garden, steps: usize) -> usize {
 
     answer += {
         let n = (d - 2) / 2;
-        let a = (1 + n) * n / 2 * 8 + 1;
-        // println!("{:?}", (n, a));
-        a * c1
+        // let t = (1 + n) * n / 2 * 8 + 1;
+        let t = 4 * n * (n + 1) + 1;
+        // println!("{:?}", (n, t));
+        t * c1
     };
 
     answer += {
         let n = (d - 1) / 2;
-        // let b = (4 + (2 * n - 1) * 4) * n / 2;
-        let b = 4 * n * n;
-        // println!("{:?}", (n, b));
-        b * c2
+        // let t = (4 + (2 * n - 1) * 4) * n / 2;
+        let t = 4 * n * n;
+        // println!("{:?}", (n, t));
+        t * c2
     };
 
     answer
