@@ -44,14 +44,14 @@ fn count_plots(garden: &Garden, steps: usize) -> usize {
     let mut visited: HashSet<(i32, i32)> = HashSet::new();
     let mut queue: VecDeque<(usize, (i32, i32))> = VecDeque::new();
     queue.push_back((steps, garden.start));
-    while let Some((steps, (x, y))) = queue.pop_front() {
+    while let Some((step, (x, y))) = queue.pop_front() {
         if !visited.insert((x, y)) {
             continue;
         }
-        if steps % 2 == 0 {
+        if step % 2 == 0 {
             plots.push((x, y));
         }
-        if steps == 0 {
+        if step == 0 {
             continue;
         }
         for (x, y) in [(x, y - 1), (x + 1, y), (x, y + 1), (x - 1, y)] {
@@ -60,7 +60,7 @@ fn count_plots(garden: &Garden, steps: usize) -> usize {
             if garden.rocks.contains(&(cx, cy)) {
                 continue;
             }
-            queue.push_back((steps - 1, (x, y)));
+            queue.push_back((step - 1, (x, y)));
         }
     }
     plots.len()
@@ -73,7 +73,7 @@ pub fn part_one(input: &str) -> usize {
 
 pub fn part_two(input: &str) -> usize {
     let garden = parse_input(input);
-    count_plots(&garden, 2000)
+    count_plots(&garden, 0)
     // count_plots(&garden, 26501365)
 }
 
