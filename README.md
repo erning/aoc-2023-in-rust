@@ -82,4 +82,8 @@ Part Two: 134906204068564
 --- Day 20: Pulse Propagation ---
 Part One: 832957356
 Part Two: 240162699605221
+
+--- Day 21: Step Counter ---
+Part One: 3532
+Part Two: 590104708070703
 ```
