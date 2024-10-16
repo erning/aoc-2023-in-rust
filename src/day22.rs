@@ -117,7 +117,9 @@ pub fn part_two(input: &str) -> usize {
                 distintegrated.insert(i);
             }
             for v in supporting[i].iter() {
-                queue.push_back(*v);
+                if !distintegrated.contains(v) {
+                    queue.push_back(*v);
+                }
             }
         }
         distintegrated.len() - 1
