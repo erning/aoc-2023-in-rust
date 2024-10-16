@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use std::collections::VecDeque;
 
 #[derive(Debug, Clone)]
 struct Point3D {
@@ -22,10 +23,11 @@ struct Brick {
 
 impl Brick {
     fn new(i: usize, a: Point3D, b: Point3D) -> Self {
-        // assert!(x1 <= x2 && y1 <= y2 && z1 <= z2);
-        // assert!(
-        //     (x1 == x2 && (y1 == y2 || z1 == z2)) || (y1 == y2 && z1 == z2)
-        // );
+        assert!(a.x <= b.x && a.y <= b.y && a.z <= b.z);
+        assert!(
+            (a.x == b.x && (a.y == b.y || a.z == b.z))
+                || (a.y == b.y && a.z == b.z)
+        );
         Brick { i, a, b }
     }
 
@@ -101,8 +103,27 @@ pub fn part_one(input: &str) -> usize {
     bricks.len() - set.len()
 }
 
-pub fn part_two(input: &str) -> u32 {
-    0
+pub fn part_two(input: &str) -> usize {
+    let mut bricks = parse_input(input);
+    let (supported, supporting) = fall(&mut bricks);
+
+    let disintegrate = |i: usize| -> usize {
+        let mut distintegrated: HashSet<usize> = HashSet::new();
+        let mut queue: VecDeque<usize> = VecDeque::new();
+        distintegrated.insert(i);
+        queue.push_back(i);
+        while let Some(i) = queue.pop_front() {
+            if supported[i].iter().all(|v| distintegrated.contains(v)) {
+                distintegrated.insert(i);
+            }
+            for v in supporting[i].iter() {
+                queue.push_back(*v);
+            }
+        }
+        distintegrated.len() - 1
+    };
+
+    bricks.iter().map(|brick| disintegrate(brick.i)).sum()
 }
 
 #[cfg(test)]
@@ -123,6 +144,6 @@ mod tests {
     fn example() {
         let input = read_example(22);
         assert_eq!(part_one(&input), 5);
-        assert_eq!(part_two(&input), 0);
+        assert_eq!(part_two(&input), 7);
     }
 }

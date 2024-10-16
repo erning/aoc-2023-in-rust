@@ -86,4 +86,8 @@ Part Two: 240162699605221
 --- Day 21: Step Counter ---
 Part One: 3532
 Part Two: 590104708070703
+
+--- Day 22: Sand Slabs ---
+Part One: 482
+Part Two: 103010
 ```
