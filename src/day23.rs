@@ -25,51 +25,49 @@ fn parse_input(input: &str) -> (Trails, i16, i16) {
 
 pub fn part_one(input: &str) -> u16 {
     let (trails, height, start) = parse_input(input);
-    println!("{:?}", (height, start));
 
     fn dfs(
         trails: &Trails,
         visited: &mut HashSet<Pos>,
+        max_steps: &mut u16,
         height: i16,
         x: i16,
         y: i16,
         steps: u16,
-    ) -> u16 {
+    ) {
         if y == height - 1 {
-            println!("steps={}", steps);
-            return steps;
+            *max_steps = steps.max(*max_steps);
+            println!("{:?}", (steps, max_steps));
+            return;
         }
-        let mut max_steps = 0;
-        let dirs = [(1, 0), (0, 1), (-1, 0), (0, -1)];
-        let range = match trails.get(&(x, y)) {
-            Some(b'.') => 0..4,
-            Some(b'>') => 0..1,
-            Some(b'v') => 1..2,
-            Some(b'<') => 2..3,
-            Some(b'^') => 3..4,
+        const DIRS: [Pos; 4] = [(1, 0), (0, 1), (-1, 0), (0, -1)];
+        let dirs = match trails.get(&(x, y)) {
+            // Some(_) => &DIRS,
+            Some(b'.') => &DIRS,
+            Some(b'>') => &DIRS[0..1],
+            Some(b'v') => &DIRS[1..2],
+            Some(b'<') => &DIRS[2..3],
+            Some(b'^') => &DIRS[3..4],
             _ => {
                 panic!();
             }
         };
-        for (dx, dy) in &dirs[range] {
+        for (dx, dy) in dirs {
             let (x, y) = (x + dx, y + dy);
-            if visited.contains(&(x, y)) {
-                continue;
-            }
-            if trails.get(&(x, y)).is_some() {
-                visited.insert((x, y));
-                max_steps = dfs(trails, visited, height, x, y, steps + 1)
-                    .max(max_steps);
+            if trails.contains_key(&(x, y)) && visited.insert((x, y)) {
+                dfs(trails, visited, max_steps, height, x, y, steps + 1);
                 visited.remove(&(x, y));
             }
         }
-        max_steps
     }
+
     let mut visited: HashSet<Pos> = HashSet::new();
-    dfs(&trails, &mut visited, height, start, 0, 0)
+    let mut max_steps = 0;
+    dfs(&trails, &mut visited, &mut max_steps, height, start, 0, 0);
+    max_steps
 }
 
-pub fn part_two(input: &str) -> u32 {
+pub fn part_two(_input: &str) -> u16 {
     0
 }
 
