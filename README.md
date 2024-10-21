@@ -90,4 +90,8 @@ Part Two: 590104708070703
 --- Day 22: Sand Slabs ---
 Part One: 482
 Part Two: 103010
+
+--- Day 23: A Long Walk ---
+Part One: 1966
+Part Two: 6286
 ```
