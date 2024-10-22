@@ -1,21 +1,28 @@
+use std::fmt::Debug;
+use std::str::FromStr;
+
 #[derive(Debug, Clone, Copy)]
-struct Line {
-    px: f32,
-    py: f32,
-    pz: f32,
-    vx: f32,
-    vy: f32,
-    vz: f32,
+struct Line<T> {
+    px: T,
+    py: T,
+    pz: T,
+    vx: T,
+    vy: T,
+    vz: T,
 }
 
-fn parse_input(input: &str) -> Vec<Line> {
+fn parse_input<T>(input: &str) -> Vec<Line<T>>
+where
+    T: FromStr + Copy,
+    <T as FromStr>::Err: Debug,
+{
     input
         .lines()
         .map(|s| {
             s.split([',', '@'])
                 .map(|s| s.trim())
-                .map(|s| s.parse::<f32>().unwrap())
-                .collect::<Vec<f32>>()
+                .map(|s| s.parse::<T>().unwrap())
+                .collect::<Vec<T>>()
         })
         .inspect(|v| assert_eq!(6, v.len()))
         .map(|v| Line {
@@ -30,11 +37,11 @@ fn parse_input(input: &str) -> Vec<Line> {
 }
 
 pub fn part_one(input: &str) -> usize {
-    fn general_equation(a: &Line) -> (f32, f32, f32) {
+    fn general_equation(a: &Line<f32>) -> (f32, f32, f32) {
         (a.vy, -a.vx, a.vx * a.py - a.vy * a.px)
     }
 
-    fn get_intersection(a: &Line, b: &Line) -> Option<(f32, f32)> {
+    fn get_intersection(a: &Line<f32>, b: &Line<f32>) -> Option<(f32, f32)> {
         let (a1, b1, c1) = general_equation(a);
         let (a2, b2, c2) = general_equation(b);
         match a1 * b2 - a2 * b1 {
@@ -80,7 +87,15 @@ pub fn part_one(input: &str) -> usize {
 }
 
 pub fn part_two(input: &str) -> u32 {
-    let lines = parse_input(input);
+    let lines: Vec<Line<i64>> = parse_input(input);
+
+    for (i, a) in lines.iter().enumerate() {
+        print!("{}: ", i + 1);
+        for t in 0..10 {
+            print!("{:?}, ", a.px + a.vx * t)
+        }
+        println!();
+    }
     0
 }
 
