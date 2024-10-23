@@ -64,19 +64,12 @@ pub fn part_one(input: &str) -> usize {
     for (i, a) in lines.iter().enumerate().take(lines.len() - 1) {
         for b in lines.iter().skip(i + 1) {
             if let Some((x, y)) = get_intersection(a, b) {
-                if x < min || x > max || y < min || y > max {
-                    continue;
-                }
-                if (a.vx < 0.0 && x > a.px) || (a.vx > 0.0 && x < a.px) {
-                    continue;
-                }
-                if (a.vy < 0.0 && y > a.py) || (a.vy > 0.0 && y < a.py) {
-                    continue;
-                }
-                if (b.vx < 0.0 && x > b.px) || (b.vx > 0.0 && x < b.px) {
-                    continue;
-                }
-                if (b.vy < 0.0 && y > b.py) || (b.vy > 0.0 && y < b.py) {
+                if (x < min || x > max || y < min || y > max)
+                    || a.vx.signum() == (a.px - x).signum()
+                    || a.vy.signum() == (a.py - y).signum()
+                    || b.vx.signum() == (b.px - x).signum()
+                    || b.vy.signum() == (b.py - y).signum()
+                {
                     continue;
                 }
                 answer += 1;
@@ -89,13 +82,13 @@ pub fn part_one(input: &str) -> usize {
 pub fn part_two(input: &str) -> u32 {
     let lines: Vec<Line<i64>> = parse_input(input);
 
-    for (i, a) in lines.iter().enumerate() {
-        print!("{}: ", i + 1);
-        for t in 0..10 {
-            print!("{:?}, ", a.px + a.vx * t)
-        }
-        println!();
-    }
+    // for (i, a) in lines.iter().enumerate() {
+    //     print!("{}: ", i + 1);
+    //     for t in 0..10 {
+    //         print!("{:?}, ", a.px + a.vx * t)
+    //     }
+    //     println!();
+    // }
     0
 }
 
