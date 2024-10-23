@@ -64,15 +64,14 @@ pub fn part_one(input: &str) -> usize {
     for (i, a) in lines.iter().enumerate().take(lines.len() - 1) {
         for b in lines.iter().skip(i + 1) {
             if let Some((x, y)) = get_intersection(a, b) {
-                if (x < min || x > max || y < min || y > max)
-                    || a.vx.signum() == (a.px - x).signum()
-                    || a.vy.signum() == (a.py - y).signum()
-                    || b.vx.signum() == (b.px - x).signum()
-                    || b.vy.signum() == (b.py - y).signum()
+                if (x >= min && x <= max && y >= min && y <= max)
+                    && a.vx.signum() == (x - a.px).signum()
+                    && a.vy.signum() == (y - a.py).signum()
+                    && b.vx.signum() == (x - b.px).signum()
+                    && b.vy.signum() == (y - b.py).signum()
                 {
-                    continue;
+                    answer += 1;
                 }
-                answer += 1;
             }
         }
     }
