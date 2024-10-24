@@ -78,17 +78,61 @@ pub fn part_one(input: &str) -> usize {
     answer
 }
 
-pub fn part_two(input: &str) -> u32 {
+pub fn part_two(input: &str) -> i64 {
     let lines: Vec<Line<i64>> = parse_input(input);
 
-    // for (i, a) in lines.iter().enumerate() {
-    //     print!("{}: ", i + 1);
-    //     for t in 0..10 {
-    //         print!("{:?}, ", a.px + a.vx * t)
-    //     }
-    //     println!();
-    // }
-    0
+    let a_xy: Vec<Vec<i64>> = lines
+        .windows(2)
+        .take(4)
+        .map(|v| (v[0], v[1]))
+        .map(|(a, b)| {
+            vec![
+                a.vy - b.vy,
+                -a.vx + b.vx,
+                -a.py + b.py,
+                a.px - b.px,
+                a.px * a.vy - a.py * a.vx - b.px * b.vy + b.py * b.vx,
+            ]
+        })
+        .collect();
+
+    let b_xy: Vec<Vec<i64>> = lines
+        .windows(2)
+        .take(4)
+        .map(|v| (v[0], v[1]))
+        .map(|(a, b)| {
+            vec![a.px * a.vy - a.py * a.vx - b.px * b.vy + b.py * b.vx]
+        })
+        .collect();
+
+    let a_xz: Vec<Vec<i64>> = lines
+        .windows(2)
+        .take(4)
+        .map(|v| (v[0], v[1]))
+        .map(|(a, b)| {
+            vec![
+                a.vz - b.vz,
+                -a.vx + b.vx,
+                -a.pz + b.pz,
+                a.px - b.px,
+                a.px * a.vz - a.pz * a.vx - b.px * b.vz + b.pz * b.vx,
+            ]
+        })
+        .collect();
+
+    let b_xz: Vec<Vec<i64>> = lines
+        .windows(2)
+        .take(4)
+        .map(|v| (v[0], v[1]))
+        .map(|(a, b)| {
+            vec![a.px * a.vz - a.pz * a.vx - b.px * b.vz + b.pz * b.vx]
+        })
+        .collect();
+
+    println!("{:?}", (a_xy, b_xy));
+    println!("{:?}", (a_xz, b_xz));
+
+    194723518367339 + 181910661443432 + 150675954587450
 }
 
 #[cfg(test)]
