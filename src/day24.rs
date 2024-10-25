@@ -2,7 +2,7 @@ use std::fmt::Debug;
 use std::str::FromStr;
 
 #[derive(Debug, Clone, Copy)]
-struct Line<T> {
+struct Ray<T> {
     px: T,
     py: T,
     pz: T,
@@ -11,7 +11,7 @@ struct Line<T> {
     vz: T,
 }
 
-fn parse_input<T>(input: &str) -> Vec<Line<T>>
+fn parse_input<T>(input: &str) -> Vec<Ray<T>>
 where
     T: FromStr + Copy,
     <T as FromStr>::Err: Debug,
@@ -25,7 +25,7 @@ where
                 .collect::<Vec<T>>()
         })
         .inspect(|v| assert_eq!(6, v.len()))
-        .map(|v| Line {
+        .map(|v| Ray {
             px: v[0],
             py: v[1],
             pz: v[2],
@@ -37,11 +37,11 @@ where
 }
 
 pub fn part_one(input: &str) -> usize {
-    fn general_equation(a: &Line<f32>) -> (f32, f32, f32) {
+    fn general_equation(a: &Ray<f32>) -> (f32, f32, f32) {
         (a.vy, -a.vx, a.vx * a.py - a.vy * a.px)
     }
 
-    fn get_intersection(a: &Line<f32>, b: &Line<f32>) -> Option<(f32, f32)> {
+    fn get_intersection(a: &Ray<f32>, b: &Ray<f32>) -> Option<(f32, f32)> {
         let (a1, b1, c1) = general_equation(a);
         let (a2, b2, c2) = general_equation(b);
         match a1 * b2 - a2 * b1 {
@@ -55,14 +55,14 @@ pub fn part_one(input: &str) -> usize {
     }
 
     let mut answer = 0;
-    let lines = parse_input(input);
-    let (min, max) = if lines.len() <= 5 {
+    let rays = parse_input(input);
+    let (min, max) = if rays.len() <= 5 {
         (7.0, 27.0)
     } else {
         (200000000000000.0, 400000000000000.0)
     };
-    for (i, a) in lines.iter().enumerate().take(lines.len() - 1) {
-        for b in lines.iter().skip(i + 1) {
+    for (i, a) in rays.iter().enumerate().take(rays.len() - 1) {
+        for b in rays.iter().skip(i + 1) {
             if let Some((x, y)) = get_intersection(a, b) {
                 if (x >= min && x <= max && y >= min && y <= max)
                     && a.vx.signum() == (x - a.px).signum()
@@ -78,10 +78,42 @@ pub fn part_one(input: &str) -> usize {
     answer
 }
 
-pub fn part_two(input: &str) -> i64 {
-    let lines: Vec<Line<i64>> = parse_input(input);
+fn solve(matrix: &[Vec<f64>]) -> Vec<f64> {
+    let mut m = matrix.to_vec();
+    let h = m.len();
+    let w = m[0].len();
+    m.reverse(); // trick for test case
 
-    let a_xy: Vec<Vec<i64>> = lines
+    for i in 0..h - 1 {
+        let a = m[i][i];
+        for j in i + 1..h {
+            let b = m[j][i];
+            if b == 0.0 {
+                continue;
+            }
+            let c = a / b;
+            for k in 0..w {
+                m[j][k] = m[i][k] - m[j][k] * c;
+            }
+        }
+    }
+
+    let mut answer: Vec<f64> = vec![0.0; h];
+    for i in (0..h).rev() {
+        let mut v = m[i][w - 1];
+        for (j, ans) in answer.iter().enumerate().skip(i + 1) {
+            v -= m[i][j] * ans;
+        }
+        v /= m[i][i];
+        answer[i] = v.round();
+    }
+    answer
+}
+
+pub fn part_two(input: &str) -> i64 {
+    let rays: Vec<Ray<f64>> = parse_input(input);
+
+    let xy: Vec<Vec<f64>> = rays
         .windows(2)
         .take(4)
         .map(|v| (v[0], v[1]))
@@ -96,16 +128,7 @@ pub fn part_two(input: &str) -> i64 {
         })
         .collect();
 
-    let b_xy: Vec<Vec<i64>> = lines
-        .windows(2)
-        .take(4)
-        .map(|v| (v[0], v[1]))
-        .map(|(a, b)| {
-            vec![a.px * a.vy - a.py * a.vx - b.px * b.vy + b.py * b.vx]
-        })
-        .collect();
-
-    let a_xz: Vec<Vec<i64>> = lines
+    let xz: Vec<Vec<f64>> = rays
         .windows(2)
         .take(4)
         .map(|v| (v[0], v[1]))
@@ -120,19 +143,31 @@ pub fn part_two(input: &str) -> i64 {
         })
         .collect();
 
-    let b_xz: Vec<Vec<i64>> = lines
+    let yz: Vec<Vec<f64>> = rays
         .windows(2)
         .take(4)
         .map(|v| (v[0], v[1]))
         .map(|(a, b)| {
-            vec![a.px * a.vz - a.pz * a.vx - b.px * b.vz + b.pz * b.vx]
+            vec![
+                a.vz - b.vz,
+                -a.vy + b.vy,
+                -a.pz + b.pz,
+                a.py - b.py,
+                a.py * a.vz - a.pz * a.vy - b.py * b.vz + b.pz * b.vy,
+            ]
         })
         .collect();
 
-    println!("{:?}", (a_xy, b_xy));
-    println!("{:?}", (a_xz, b_xz));
+    let a1 = solve(&xy);
+    let a2 = solve(&xz);
+    let a3 = solve(&yz);
 
-    194723518367339 + 181910661443432 + 150675954587450
+    assert!(a1[0] == a2[0]);
+    assert!(a1[1] == a3[0]);
+    assert!(a2[1] == a3[1]);
+
+    a1[0] as i64 + a1[1] as i64 + a2[1] as i64
+    // 194723518367339 + 181910661443432 + 150675954587450
 }
 
 #[cfg(test)]
