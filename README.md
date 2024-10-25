@@ -94,4 +94,8 @@ Part Two: 103010
 --- Day 23: A Long Walk ---
 Part One: 1966
 Part Two: 6286
+
+--- Day 24: Never Tell Me The Odds ---
+Part One: 24627
+Part Two: 527310134398221
 ```
