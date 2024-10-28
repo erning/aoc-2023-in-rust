@@ -78,14 +78,22 @@ pub fn part_one(input: &str) -> usize {
     answer
 }
 
-fn solve(matrix: &[Vec<f64>]) -> Vec<f64> {
+fn gaussian_elimination(matrix: &[Vec<f64>]) -> Vec<f64> {
     let mut m = matrix.to_vec();
     let h = m.len();
     let w = m[0].len();
-    m.reverse(); // trick for test case
+    assert!(h == w - 1);
 
     for i in 0..h - 1 {
+        let mut max_row = i;
+        for j in i + 1..h {
+            if m[j][i].abs() > m[max_row][i].abs() {
+                max_row = j;
+            }
+        }
+        m.swap(i, max_row);
         let a = m[i][i];
+        assert!(a != 0.0);
         for j in i + 1..h {
             let b = m[j][i];
             if b == 0.0 {
@@ -158,9 +166,9 @@ pub fn part_two(input: &str) -> i64 {
         })
         .collect();
 
-    let a1 = solve(&xy);
-    let a2 = solve(&xz);
-    let a3 = solve(&yz);
+    let a1 = gaussian_elimination(&xy);
+    let a2 = gaussian_elimination(&xz);
+    let a3 = gaussian_elimination(&yz);
 
     assert!(a1[0] == a2[0]);
     assert!(a1[1] == a3[0]);
